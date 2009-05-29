@@ -61,4 +61,12 @@ def quit(app):
 @update_status
 def switch_unread_mode(app):
   app.mode = MODE.UNREAD
-#  app.ui.grid_panel.update(app.reader.get_unread_entries())
+  app.ui.grid_panel.update(app.reader.get_unread_entries())
+
+@callback(MODE.UNREAD, 'j')
+def next(app):
+  return app.ui.grid_panel.next(app.reader.get_unread_entries())
+
+@callback(MODE.UNREAD, 'k')
+def prev(app):
+  return app.ui.grid_panel.prev(app.reader.get_unread_entries())

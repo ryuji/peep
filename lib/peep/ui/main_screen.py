@@ -5,7 +5,7 @@ import curses.panel
 
 #from browse_panel import BrowsePanel
 from command_line import CommandLine
-#from grid_panel  import GridPanel
+from grid_panel  import GridPanel
 from status_line import StatusLine
 from component import Component
 
@@ -27,7 +27,7 @@ class MainScreen(Component):
 
     # init screen
 #    self.browse_panel = BrowsePanel(stdscr)
-#    self.grid_panel = GridPanel(stdscr)
+    self.grid_panel = GridPanel(stdscr)
     self.status_line = StatusLine(stdscr)
     self.command_line = CommandLine(stdscr)
 

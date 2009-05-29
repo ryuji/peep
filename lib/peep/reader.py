@@ -42,6 +42,8 @@ class Reader(object):
       id = entry['sources'].keys()[0]
       entry['subscription_id'] = id
       entry['subscription_title'] = subscriptions[id]['title']
+      entry['pinned'] = False # TODO
+      entry['stared'] = False # TODO
       unread = entry['categories']['user/-/state/com.google/fresh']
       entry['unread'] = unread=='fresh'
     return unread_feed
