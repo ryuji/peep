@@ -1,0 +1,13 @@
+[credential]
+# login account for Google Reader
+email = your_google_reader_account@gmail.com
+# password for Google Reader
+password = your_google_reader_password
+
+[unread]
+# max count of unread entries
+max_count = 200
+
+[browse]
+# max count of open entry in external web browser
+max_count = 6
