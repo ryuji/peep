@@ -2,6 +2,8 @@
 
 from GoogleReader import GoogleReader, CONST
 
+from const import CONF
+
 def caching(key):
   def decorator(fn):
     def wrapper(self, *args, **kwargs):
@@ -36,17 +38,20 @@ class Reader(object):
 
   @caching('unread_entries')
   def get_unread_entries(self):
-    unread_feed = list(self.get_unread_feed().get_entries())
     subscriptions = self.get_subscriptions()
-    for entry in unread_feed:
-      id = entry['sources'].keys()[0]
-      entry['subscription_id'] = id
-      entry['subscription_title'] = subscriptions[id]['title']
-      entry['pinned'] = False # TODO
-      entry['stared'] = False # TODO
-      unread = entry['categories']['user/-/state/com.google/fresh']
-      entry['unread'] = unread=='fresh'
-    return unread_feed
+    entries = []
+    while 1:
+      for entry in self.get_unread_feed().get_entries():
+        id = entry['sources'].keys()[0]
+        entry['subscription_id'] = id
+        entry['subscription_title'] = subscriptions[id]['title']
+        entry['pinned'] = False # TODO
+        entry['stared'] = False # TODO
+        unread = entry['categories']['user/-/state/com.google/fresh']
+        entry['unread'] = unread=='fresh'
+        entries.append(entry)
+      if len(entries) >= int(CONF.unread.max_count): break
+    return entries
 
   @caching('feed_title')
   def get_feed_title(self):

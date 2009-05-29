@@ -1,5 +1,6 @@
 # vim: fileencoding=utf-8
 
+from peep.const import CONF
 from panel import *
 
 class GridPanel(Panel):
@@ -8,6 +9,7 @@ class GridPanel(Panel):
     Panel.__init__(self, stdscr)
 
     self.selected = 0
+    self.scroll = 0
     self.rows = []
     for i in range(self.height):
       self.rows.append(self.win.subwin(1, self.width, i, 0))
@@ -26,7 +28,10 @@ class GridPanel(Panel):
 
   def update_row(self, index, entry):
     row = self.rows[index]
-    row.bkgd(' ', curses.A_REVERSE if self.selected==index else curses.A_NORMAL)
+    if self.selected-self.scroll == index:
+      row.bkgd(' ', curses.A_REVERSE)
+    else:
+      row.bkgd(' ', curses.A_NORMAL)
 
     published = format_date(entry['published'],'%m-%d %H:%M')
     n = len(published)
@@ -46,24 +51,36 @@ class GridPanel(Panel):
     row.addstr(0, x, U(value, width))
     return x+width+space
 
-  def select(self, old_entry, new_entry=None, new_index=0):
-    if new_entry:
-      old_index = self.selected
-      self.selected = new_index
-      self.update_row(old_index, old_entry)
-      self.update_row(new_index, new_entry)
-    else:
-      self.update_row(self.selected, old_entry)
+  def next(self, entries):
+    if self.selected == len(entries)-1: return False
+
+    old_index, new_index = self.selected, self.selected+1
+    # scroll down
+    if new_index >= self.height:
+      self.win.scroll()
+      self.win.refresh()
+      self.scroll += 1
+    # update selected row
+    self.selected = new_index
+    self.update_row(old_index-self.scroll, entries[old_index])
+    self.update_row(new_index-self.scroll, entries[new_index])
     curses.doupdate()
 
-  def next(self, entries):
-    # FIXME scroll
-    selected, next = self.selected, self.selected+1
-    if next < len(entries) and next < self.height:
-      self.select(entries[selected], entries[next], next)
+    return True
 
   def prev(self, entries):
-    # FIXME scroll
-    selected, prev = self.selected, self.selected-1
-    if selected > 0:
-      self.select(entries[selected], entries[prev], prev)
+    if self.selected == 0: return False
+
+    old_index, new_index = self.selected, self.selected-1
+    # scroll up
+    if new_index-self.scroll < 0:
+      self.win.scroll(-1)
+      self.win.refresh()
+      self.scroll -= 1
+    # update selected row
+    self.selected = new_index
+    self.update_row(old_index-self.scroll, entries[old_index])
+    self.update_row(new_index-self.scroll, entries[new_index])
+    curses.doupdate()
+
+    return True
