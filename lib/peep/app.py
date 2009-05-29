@@ -40,5 +40,5 @@ class App(object):
   def event_loop(self, stdscr):
     self.stdscr = stdscr  # need except KeyboardInterrupt
     self.ui = MainScreen(stdscr)
-    self.mode = MODE.UNREAD
+    command.switch_unread_mode(self)
     while 1: command.execute(self, stdscr.getkey())

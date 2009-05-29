@@ -3,7 +3,9 @@
 import curses
 import curses.panel
 
+#from browse_panel import BrowsePanel
 from command_line import CommandLine
+#from grid_panel  import GridPanel
 from status_line import StatusLine
 from component import Component
 
@@ -24,6 +26,8 @@ class MainScreen(Component):
       curses.init_pair(2, curses.COLOR_YELLOW, -1)
 
     # init screen
+#    self.browse_panel = BrowsePanel(stdscr)
+#    self.grid_panel = GridPanel(stdscr)
     self.status_line = StatusLine(stdscr)
     self.command_line = CommandLine(stdscr)
 
