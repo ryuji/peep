@@ -4,7 +4,7 @@ from GoogleReader import GoogleReader, CONST
 
 from const import CONF
 
-def caching(key):
+def cache(key):
   def decorator(fn):
     def wrapper(self, *args, **kwargs):
       if not self.cache.has_key(key):
@@ -25,18 +25,18 @@ class Reader(object):
   def clear_cache(self):
     self.cache = {}
 
-  @caching('subscriptions')
+  @cache('subscriptions')
   def get_subscriptions(self):
     subscriptions = {}
     for x in self.reader.get_subscription_list()['subscriptions']:
       subscriptions[x['id']] = x
     return subscriptions
 
-  @caching('unread_feed')
+  @cache('unread_feed')
   def get_unread_feed(self):
     return self.reader.get_unread()
 
-  @caching('unread_entries')
+  @cache('unread_entries')
   def get_unread_entries(self):
     subscriptions = self.get_subscriptions()
     entries = []
@@ -53,18 +53,18 @@ class Reader(object):
       if len(entries) >= int(CONF.unread.max_count): break
     return entries
 
-  @caching('feed_title')
+  @cache('feed_title')
   def get_feed_title(self):
     return self.get_unread_feed().get_title()
 
-  @caching('unread_counts')
+  @cache('unread_counts')
   def get_unread_counts(self):
     counts = {}
     for x in self.reader.get_unread_count_list()['unreadcounts']:
       counts[x['id']] = x['count']
     return counts
 
-  @caching('unread_count')
+  @cache('unread_count')
   def get_unread_count(self):
     for k,v in self.get_unread_counts().iteritems():
       if k.endswith('/state/com.google/reading-list'): return v

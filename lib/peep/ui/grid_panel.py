@@ -9,7 +9,7 @@ class GridPanel(Panel):
     Panel.__init__(self, stdscr)
 
     self.selected = 0
-    self.scroll = 0
+    self.scrolled = 0
     self.rows = []
     for i in range(self.height):
       self.rows.append(self.win.subwin(1, self.width, i, 0))
@@ -28,7 +28,7 @@ class GridPanel(Panel):
 
   def update_row(self, index, entry):
     row = self.rows[index]
-    if self.selected-self.scroll == index:
+    if self.selected-self.scrolled == index:
       row.bkgd(' ', curses.A_REVERSE)
     else:
       row.bkgd(' ', curses.A_NORMAL)
@@ -51,36 +51,31 @@ class GridPanel(Panel):
     row.addstr(0, x, U(value, width))
     return x+width+space
 
-  def next(self, entries):
-    if self.selected == len(entries)-1: return False
-
-    old_index, new_index = self.selected, self.selected+1
-    # scroll down
-    if new_index >= self.height:
-      self.win.scroll()
-      self.win.refresh()
-      self.scroll += 1
-    # update selected row
+  def select(self, entries, new_index):
+    old_index = self.selected
     self.selected = new_index
-    self.update_row(old_index-self.scroll, entries[old_index])
-    self.update_row(new_index-self.scroll, entries[new_index])
+    self.update_row(old_index-self.scrolled, entries[old_index])
+    self.update_row(new_index-self.scrolled, entries[new_index])
     curses.doupdate()
 
+  def scroll(self, lines=1):
+    self.win.scroll(lines)
+    self.win.refresh()
+    self.scrolled += lines
+
+  def move(self, end_cond, scroll_cond, entries, lines=1):
+    new_index = self.selected+lines
+    if end_cond(new_index): return False
+    if scroll_cond(new_index): self.scroll(lines)
+    self.select(entries, new_index)
     return True
+
+  def next(self, entries):
+    return self.move(lambda i: i == len(entries),
+                     lambda i: i-self.scrolled >= self.height,
+                     entries)
 
   def prev(self, entries):
-    if self.selected == 0: return False
-
-    old_index, new_index = self.selected, self.selected-1
-    # scroll up
-    if new_index-self.scroll < 0:
-      self.win.scroll(-1)
-      self.win.refresh()
-      self.scroll -= 1
-    # update selected row
-    self.selected = new_index
-    self.update_row(old_index-self.scroll, entries[old_index])
-    self.update_row(new_index-self.scroll, entries[new_index])
-    curses.doupdate()
-
-    return True
+    return self.move(lambda i: i < 0,
+                     lambda i: i-self.scrolled < 0,
+                     entries, -1)
