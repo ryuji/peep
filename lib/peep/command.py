@@ -63,6 +63,15 @@ def switch_unread_mode(app):
   app.mode = MODE.UNREAD
   app.ui.grid_panel.update(app.reader.get_unread_entries())
 
+@callback(MODE.UNREAD, '\n')
+@loading
+@update_status
+def switch_browse_mode(app):
+  app.mode = MODE.BROWSE
+  entry = app.reader.get_unread_entries()[app.ui.grid_panel.selected]
+#  self.reader.set_read(entry)
+  app.ui.browse_panel.update(entry)
+
 @callback(MODE.UNREAD, 'j')
 def next(app):
   return app.ui.grid_panel.next(app.reader.get_unread_entries())
@@ -70,3 +79,11 @@ def next(app):
 @callback(MODE.UNREAD, 'k')
 def prev(app):
   return app.ui.grid_panel.prev(app.reader.get_unread_entries())
+
+@callback(MODE.BROWSE, 'j')
+def next_browse(app):
+  if next(app): switch_browse_mode(app)
+
+@callback(MODE.BROWSE, 'k')
+def prev_browse(app):
+  if prev(app): switch_browse_mode(app)

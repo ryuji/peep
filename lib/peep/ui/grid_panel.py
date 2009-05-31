@@ -22,7 +22,7 @@ class GridPanel(Panel):
     curses.doupdate()
 
   def update(self, entries):
-    for i, entry in enumerate(entries[self.scrolled:self.height]):
+    for i,entry in enumerate(entries[self.scrolled:self.height]):
       self.update_row(i, entry)
     self.show()
 
