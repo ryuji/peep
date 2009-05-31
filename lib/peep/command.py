@@ -48,7 +48,6 @@ def update_status(fn):
                               app.reader.get_unread_count())
   return wrapper
 
-
 # callback functions ---------------------------------------------------------
 
 @callback(MODE.UNREAD, 'q')
@@ -72,7 +71,7 @@ def switch_unread_mode(app):
 @update_status
 def switch_browse_mode(app):
   app.mode = MODE.BROWSE
-  entry = app.reader.get_unread_entries()[app.ui.grid_panel.selected]
+  entry = get_entry(app)
   app.ui.browse_panel.update(entry)
   app.reader.set_read(entry)
 
@@ -92,4 +91,16 @@ def next_browse(app):
 def prev_browse(app):
   if prev(app): switch_browse_mode(app)
 
+@callback(MODE.UNREAD, 'm')
+@callback(MODE.BROWSE, 'm')
+@update_status
+def toggle_read(app):
+  entry = get_entry(app)
+  if entry['unread']:
+    app.reader.set_read(entry)
+  else:
+    app.reader.set_unread(entry)
+  app.ui.grid_panel.update_row(entry)
 
+def get_entry(app):
+  return app.reader.get_unread_entries()[app.ui.grid_panel.selected]

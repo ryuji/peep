@@ -23,10 +23,11 @@ class GridPanel(Panel):
 
   def update(self, entries):
     for i,entry in enumerate(entries[self.scrolled:self.height]):
-      self.update_row(i, entry)
+      self.update_row(entry, i)
     self.show()
 
-  def update_row(self, index, entry):
+  def update_row(self, entry, index=None):
+    if index == None: index = self.selected-self.scrolled
     row = self.rows[index]
     row.erase()
     if self.selected-self.scrolled == index:
@@ -55,8 +56,8 @@ class GridPanel(Panel):
   def select(self, entries, new_index):
     old_index = self.selected
     self.selected = new_index
-    self.update_row(old_index-self.scrolled, entries[old_index])
-    self.update_row(new_index-self.scrolled, entries[new_index])
+    self.update_row(entries[old_index], old_index-self.scrolled)
+    self.update_row(entries[new_index], new_index-self.scrolled)
     curses.doupdate()
 
   def scroll(self, lines=1):
