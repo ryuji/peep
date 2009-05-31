@@ -8,18 +8,18 @@ class GridPanel(Panel):
   def __init__(self, stdscr):
     Panel.__init__(self, stdscr)
 
-    self.selected = 0
-    self.scrolled = 0
+    self.selected = self.scrolled = 0
     self.rows = []
     for i in range(self.height):
       self.rows.append(self.win.subwin(1, self.width, i, 0))
 
   def clear(self):
     self.rows[self.selected].bkgd(' ', curses.A_NORMAL)
-    self.selected = 0
+    self.selected = self.scrolled = 0
     for row in self.rows:
       row.erase()
       row.noutrefresh()
+    curses.doupdate()
 
   def update(self, entries):
     for i, entry in enumerate(entries):
