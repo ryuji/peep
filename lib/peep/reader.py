@@ -34,23 +34,22 @@ class Reader(object):
 
   @cache('unread_feed')
   def get_unread_feed(self):
-    return self.reader.get_unread()
+    return self.reader.get_feed(count=CONF.unread.max_count,
+                                exclude_target=CONST.ATOM_STATE_READ)
 
   @cache('unread_entries')
   def get_unread_entries(self):
     subscriptions = self.get_subscriptions()
     entries = []
-    while 1:
-      for entry in self.get_unread_feed().get_entries():
-        id = entry['sources'].keys()[0]
-        entry['subscription_id'] = id
-        entry['subscription_title'] = subscriptions[id]['title']
-        entry['pinned'] = False # TODO
-        entry['stared'] = False # TODO
-        unread = entry['categories']['user/-/state/com.google/fresh']
-        entry['unread'] = unread=='fresh'
-        entries.append(entry)
-      if len(entries) >= int(CONF.unread.max_count): break
+    for entry in self.get_unread_feed().get_entries():
+      id = entry['sources'].keys()[0]
+      entry['subscription_id'] = id
+      entry['subscription_title'] = subscriptions[id]['title']
+      entry['pinned'] = False
+      entry['stared'] = False # TODO
+      unread = entry['categories']['user/-/state/com.google/fresh']
+      entry['unread'] = unread=='fresh'
+      entries.append(entry)
     return entries
 
   @cache('feed_title')
