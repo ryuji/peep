@@ -107,6 +107,12 @@ def toggle_pin(app):
   app.reader.toggle_pin(entry)
   update_panel(app, entry)
 
+@callback(MODE.UNREAD, 'r')
+def refresh(app):
+  app.reader.clear_cache()
+  app.ui.grid_panel.clear()
+  switch_unread_mode(app)
+
 # helper functions -----------------------------------------------------------
 
 def get_entry(app):
