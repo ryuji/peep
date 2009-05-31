@@ -1,8 +1,9 @@
 # vim: fileencoding=utf-8
 
 import sys
+import webbrowser
 
-from const import MODE
+from const import CONF, MODE
 
 CALLBACKS = {
   MODE.UNREAD: {},
@@ -59,6 +60,12 @@ def quit(app):
 def back(app):
   switch_unread_mode(app)
 
+@callback(MODE.UNREAD, 'r')
+def refresh(app):
+  app.reader.clear_cache()
+  app.ui.grid_panel.clear()
+  switch_unread_mode(app)
+
 @callback(MODE.BROWSE, 'u')
 @loading
 @update_status
@@ -71,7 +78,7 @@ def switch_unread_mode(app):
 @update_status
 def switch_browse_mode(app):
   app.mode = MODE.BROWSE
-  entry = get_entry(app)
+  entry = get_selected_entry(app)
   app.ui.browse_panel.update(entry)
   app.reader.set_read(entry)
 
@@ -95,7 +102,7 @@ def prev_browse(app):
 @callback(MODE.BROWSE, 'm')
 @update_status
 def toggle_read(app):
-  entry = get_entry(app)
+  entry = get_selected_entry(app)
   app.reader.toggle_read(entry)
   update_panel(app, entry)
 
@@ -103,21 +110,44 @@ def toggle_read(app):
 @callback(MODE.BROWSE, 'p')
 @update_status
 def toggle_pin(app):
-  entry = get_entry(app)
+  entry = get_selected_entry(app)
   app.reader.toggle_pin(entry)
   update_panel(app, entry)
 
-@callback(MODE.UNREAD, 'r')
-def refresh(app):
-  app.reader.clear_cache()
-  app.ui.grid_panel.clear()
-  switch_unread_mode(app)
+@callback(MODE.UNREAD, 'O')
+@callback(MODE.BROWSE, 'O')
+@update_status
+def open(app):
+  entry = get_selected_entry(app)
+  open_external_browser(app, entry)
+  update_panel(app, entry)
+
+@callback(MODE.UNREAD, 'o')
+@callback(MODE.BROWSE, 'o')
+@update_status
+def open_pinned_entries(app):
+  for i in range(int(CONF.browse.max_count)):
+    if app.reader.get_pinned_count() == 0: break
+    entry = app.reader.get_pinned_entries().pop(0)
+    open_external_browser(app, entry)
+    entry['pinned'] = False
+  if app.mode == MODE.BROWSE:
+    app.ui.browse_panel.update_header(get_selected_entry(app))
+  else:
+    app.ui.grid_panel.update(app.reader.get_unread_entries())
 
 # helper functions -----------------------------------------------------------
 
-def get_entry(app):
+def get_selected_entry(app):
   return app.reader.get_unread_entries()[app.ui.grid_panel.selected]
 
 def update_panel(app, entry):
   if app.mode == MODE.BROWSE: app.ui.browse_panel.update_header(entry)
   else:                       app.ui.grid_panel.update_row(entry)
+
+def open_external_browser(app, entry):
+  try:
+    webbrowser.open_new_tab(entry['link'])
+    app.reader.set_read(entry)
+  except:
+    raise Exception(u'Failed to open external web browser')
