@@ -22,12 +22,13 @@ class GridPanel(Panel):
     curses.doupdate()
 
   def update(self, entries):
-    for i, entry in enumerate(entries):
-      if i < self.height: self.update_row(i, entry)
+    for i, entry in enumerate(entries[self.scrolled:self.height]):
+      self.update_row(i, entry)
     self.show()
 
   def update_row(self, index, entry):
     row = self.rows[index]
+    row.erase()
     if self.selected-self.scrolled == index:
       row.bkgd(' ', curses.A_REVERSE)
     else:
