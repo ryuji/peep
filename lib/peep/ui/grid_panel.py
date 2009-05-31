@@ -14,7 +14,7 @@ class GridPanel(Panel):
       self.rows.append(self.win.subwin(1, self.width, i, 0))
 
   def clear(self):
-    self.rows[self.selected].bkgd(' ', curses.A_NORMAL)
+    self.rows[self.selected-self.scrolled].bkgd(' ', curses.A_NORMAL)
     self.selected = self.scrolled = 0
     for row in self.rows:
       row.erase()
