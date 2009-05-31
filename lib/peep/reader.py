@@ -32,6 +32,10 @@ class Reader(object):
       subscriptions[x['id']] = x
     return subscriptions
 
+  @cache('feed_title')
+  def get_feed_title(self):
+    return self.get_unread_feed().get_title()
+
   @cache('unread_feed')
   def get_unread_feed(self):
     return self.reader.get_feed(count=CONF.unread.max_count,
@@ -52,10 +56,6 @@ class Reader(object):
       entries.append(entry)
     return entries
 
-  @cache('feed_title')
-  def get_feed_title(self):
-    return self.get_unread_feed().get_title()
-
   @cache('unread_counts')
   def get_unread_counts(self):
     counts = {}
@@ -69,6 +69,13 @@ class Reader(object):
       if k.endswith('/state/com.google/reading-list'): return v
     return 0
 
+  @cache('pinned_entries')
+  def get_pinned_entries(self):
+    return []
+
+  def get_pinned_count(self):
+    return len(self.get_pinned_entries())
+
   def set_read(self, entry):
     if not entry['unread']: return
     self.reader.set_read(entry['google_id'])
@@ -80,3 +87,12 @@ class Reader(object):
     self.reader.set_unread(entry['google_id'])
     entry['unread'] = True
     self.cache['unread_count'] += 1
+
+  def toggle_read(self, entry):
+     if entry['unread']: self.set_read(entry)
+     else:               self.set_unread(entry)
+
+  def toggle_pin(self, entry):
+    entry['pinned'] = not entry['pinned']
+    if entry['pinned']: self.get_pinned_entries().append(entry)
+    else:               self.get_pinned_entries().remove(entry)

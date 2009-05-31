@@ -43,7 +43,7 @@ def update_status(fn):
     fn(app)
     # TODO
     app.ui.status_line.update(app.reader.get_feed_title(),
-                              0,#len(app.reader.pinned_entries),
+                              app.reader.get_pinned_count(),
                               0,
                               app.reader.get_unread_count())
   return wrapper
@@ -96,11 +96,22 @@ def prev_browse(app):
 @update_status
 def toggle_read(app):
   entry = get_entry(app)
-  if entry['unread']:
-    app.reader.set_read(entry)
-  else:
-    app.reader.set_unread(entry)
-  app.ui.grid_panel.update_row(entry)
+  app.reader.toggle_read(entry)
+  update_panel(app, entry)
+
+@callback(MODE.UNREAD, 'p')
+@callback(MODE.BROWSE, 'p')
+@update_status
+def toggle_pin(app):
+  entry = get_entry(app)
+  app.reader.toggle_pin(entry)
+  update_panel(app, entry)
+
+# helper functions -----------------------------------------------------------
 
 def get_entry(app):
   return app.reader.get_unread_entries()[app.ui.grid_panel.selected]
+
+def update_panel(app, entry):
+  if app.mode == MODE.BROWSE: app.ui.browse_panel.update_header(entry)
+  else:                       app.ui.grid_panel.update_row(entry)
