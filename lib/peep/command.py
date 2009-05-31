@@ -56,6 +56,10 @@ def update_status(fn):
 def quit(app):
   sys.exit()
 
+@callback(MODE.BROWSE, 'q')
+def back(app):
+  switch_unread_mode(app)
+
 @callback(MODE.BROWSE, 'u')
 @loading
 @update_status
@@ -87,3 +91,5 @@ def next_browse(app):
 @callback(MODE.BROWSE, 'k')
 def prev_browse(app):
   if prev(app): switch_browse_mode(app)
+
+
