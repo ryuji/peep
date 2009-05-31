@@ -69,3 +69,15 @@ class Reader(object):
     for k,v in self.get_unread_counts().iteritems():
       if k.endswith('/state/com.google/reading-list'): return v
     return 0
+
+  def set_read(self, entry):
+    if not entry['unread']: return
+    self.reader.set_read(entry['google_id'])
+    entry['unread'] = False
+    self.cache['unread_count'] -= 1
+
+  def set_unread(self, entry):
+    if entry['unread']: return
+    self.reader.set_unread(entry['google_id'])
+    entry['unread'] = True
+    self.cache['unread_count'] += 1
