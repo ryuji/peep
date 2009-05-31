@@ -19,9 +19,7 @@ class Panel(Component):
   def show(self):
     top = curses.panel.top_panel()
     if not top.hidden(): top.hide()
-
     self.panel.top()
     self.panel.show()
-
     curses.panel.update_panels()
     curses.doupdate()

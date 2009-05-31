@@ -73,8 +73,8 @@ def switch_unread_mode(app):
 def switch_browse_mode(app):
   app.mode = MODE.BROWSE
   entry = app.reader.get_unread_entries()[app.ui.grid_panel.selected]
-  app.reader.set_read(entry)
   app.ui.browse_panel.update(entry)
+  app.reader.set_read(entry)
 
 @callback(MODE.UNREAD, 'j')
 def next(app):
