@@ -73,7 +73,7 @@ class GridPanel(Panel):
     return True
 
   def next(self, entries):
-    return self.move(lambda i: i == len(entries),
+    return self.move(lambda i: i >= len(entries),
                      lambda i: i-self.scrolled >= self.height,
                      entries)
 
