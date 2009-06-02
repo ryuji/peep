@@ -33,7 +33,7 @@ class CommandLine(Line):
   def confirm(self, message, callback, defans=True):
     self.inform(message+(' (Y/n)' if defans else ' (y/N)'))
     while 1:
-      ans = self.stdscr.getkey().lower()
+      ans = self.win.getkey().lower()
       if ans == '\n': ans = 'y' if defans else 'n'
       if ans == 'y':
         callback()

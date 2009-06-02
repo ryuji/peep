@@ -98,6 +98,23 @@ def next_browse(app):
 def prev_browse(app):
   if prev(app): switch_browse_mode(app)
 
+@callback(MODE.BROWSE, ' ')
+def down(app):
+  app.ui.browse_panel.down(get_selected_entry(app))
+
+@callback(MODE.BROWSE, '\n')
+@callback(MODE.BROWSE, 'J')
+def down1(app):
+  app.ui.browse_panel.down(get_selected_entry(app), 1)
+
+@callback(MODE.BROWSE, '-')
+def up(app):
+  app.ui.browse_panel.up(get_selected_entry(app))
+
+@callback(MODE.BROWSE, 'K')
+def up1(app):
+  app.ui.browse_panel.up(get_selected_entry(app), 1)
+
 @callback(MODE.UNREAD, 'm')
 @callback(MODE.BROWSE, 'm')
 @update_status
