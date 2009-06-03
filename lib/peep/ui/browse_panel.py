@@ -53,7 +53,7 @@ class BrowsePanel(Panel):
     self.body.noutrefresh()
 
   def move(self, end_cond, entry, range, way=1):
-    scrolled = self.scrolled + (range*way if range else self.b_height*way)
+    scrolled = self.scrolled + (range*way if range else (self.b_height-1)*way)
     if end_cond(scrolled+(self.b_height if range else 1)): return
     self.scrolled = scrolled
     if self.scrolled < 0: self.scrolled = 0
