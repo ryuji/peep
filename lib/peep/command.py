@@ -11,13 +11,21 @@ CALLBACKS = {
   MODE.STARED: {},
 }
 
-def execute(app, key):
-  callback = CALLBACKS.get(app.mode).get(key)
+class Message(Exception):
+
+  def __init__(self, message, type='inform'):
+    self.message, self.type = message, type
+
+  def __str__(self):
+    return self.message
+
+def execute(app, key=None):
+  callback = CALLBACKS.get(app.mode).get(key) if key else switch_unread_mode
   if callback:
     try:
       callback(app)
-    except Exception, e:
-      app.ui.command_line.err(e.message)
+    except Message,   m: getattr(app.ui.command_line, m.type)(m)
+    except Exception, e: app.ui.command_line.err(e)
 
 # decorator functions --------------------------------------------------------
 
@@ -41,12 +49,12 @@ def loading(fn):
 
 def update_status(fn):
   def wrapper(app):
-    fn(app)
     # TODO
     app.ui.status_line.update(app.reader.get_feed_title(),
                               app.reader.get_pinned_count(),
                               0,
                               app.reader.get_unread_count())
+    fn(app)
   return wrapper
 
 # callback functions ---------------------------------------------------------
@@ -71,7 +79,11 @@ def refresh(app):
 @update_status
 def switch_unread_mode(app):
   app.mode = MODE.UNREAD
-  app.ui.grid_panel.update(app.reader.get_unread_entries())
+  entries = app.reader.get_unread_entries()
+  if entries:
+    app.ui.grid_panel.update(entries)
+  else:
+    raise Message('Your reading list has no unread items.')
 
 @callback(MODE.UNREAD, '\n')
 @loading
@@ -151,7 +163,7 @@ def open_pinned_entries(app):
   if app.mode == MODE.BROWSE:
     app.ui.browse_panel.update_header(get_selected_entry(app))
   else:
-    app.ui.grid_panel.update(app.reader.get_unread_entries())
+    switch_unread_mode(app)
 
 # helper functions -----------------------------------------------------------
 
@@ -167,4 +179,4 @@ def open_external_browser(app, entry):
     webbrowser.open_new_tab(entry['link'])
     app.reader.set_read(entry)
   except:
-    raise Exception(u'Failed to open external web browser')
+    raise Message(u'Failed to open external web browser', 'err')
