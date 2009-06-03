@@ -35,7 +35,7 @@ class BrowsePanel(Panel):
     self.header.addstr(3, 0, F('Author', entry['author']))
     self.header.addstr(3, self.width-1, u'!' if entry['pinned'] else u' ')
     self.header.hline(4, 0, curses.ACS_HLINE, self.width)
-    self.header.noutrefresh()
+    self.header.refresh()
 
   def update_body(self, entry):
     self.body.erase()

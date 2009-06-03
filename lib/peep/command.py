@@ -49,12 +49,12 @@ def loading(fn):
 
 def update_status(fn):
   def wrapper(app):
+    fn(app)
     # TODO
     app.ui.status_line.update(app.reader.get_feed_title(),
                               app.reader.get_pinned_count(),
                               0,
                               app.reader.get_unread_count())
-    fn(app)
   return wrapper
 
 # callback functions ---------------------------------------------------------
@@ -158,8 +158,8 @@ def open_pinned_entries(app):
   for i in range(int(CONF.browse.max_count)):
     if app.reader.get_pinned_count() == 0: break
     entry = app.reader.get_pinned_entries().pop(0)
-    open_external_browser(app, entry)
     entry['pinned'] = False
+    open_external_browser(app, entry)
   if app.mode == MODE.BROWSE:
     app.ui.browse_panel.update_header(get_selected_entry(app))
   else:
