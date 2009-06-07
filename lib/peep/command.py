@@ -5,7 +5,7 @@ import webbrowser
 
 from const import CONF, MODE
 
-CALLBACKS = {
+KEYBINDS = {
   MODE.UNREAD: {},
   MODE.BROWSE: {},
   MODE.STARED: {},
@@ -20,7 +20,7 @@ class Message(Exception):
     return self.message
 
 def execute(app, key=None):
-  callback = CALLBACKS.get(app.mode).get(key) if key else switch_unread_mode
+  callback = KEYBINDS.get(app.mode).get(key) if key else switch_unread_mode
   if callback:
     try:
       callback(app)
@@ -29,9 +29,9 @@ def execute(app, key=None):
 
 # decorator functions --------------------------------------------------------
 
-def callback(mode, key):
+def keybind(mode, *keys):
   def decorator(fn):
-    CALLBACKS[mode][key] = fn
+    for key in keys: KEYBINDS[mode][key] = fn
     return fn
   return decorator
 
@@ -57,24 +57,24 @@ def update_status(fn):
                               app.reader.get_unread_count())
   return wrapper
 
-# callback functions ---------------------------------------------------------
+# keybind functions ---------------------------------------------------------
 
-@callback(MODE.UNREAD, 'q')
+@keybind(MODE.UNREAD, 'q')
 @confirm(u'Are you sure you want to quit?')
 def quit(app):
   sys.exit()
 
-@callback(MODE.BROWSE, 'q')
+@keybind(MODE.BROWSE, 'q')
 def back(app):
   switch_unread_mode(app)
 
-@callback(MODE.UNREAD, 'r')
+@keybind(MODE.UNREAD, 'r')
 def refresh(app):
   app.reader.clear_cache()
   app.ui.grid_panel.clear()
   switch_unread_mode(app)
 
-@callback(MODE.BROWSE, 'u')
+@keybind(MODE.BROWSE, 'u')
 @loading
 @update_status
 def switch_unread_mode(app):
@@ -85,7 +85,7 @@ def switch_unread_mode(app):
   else:
     raise Message('Your reading list has no unread items.')
 
-@callback(MODE.UNREAD, '\n')
+@keybind(MODE.UNREAD, '\n')
 @loading
 @update_status
 def switch_browse_mode(app):
@@ -94,65 +94,64 @@ def switch_browse_mode(app):
   app.ui.browse_panel.update(entry)
   app.reader.set_read(entry)
 
-@callback(MODE.UNREAD, 'j')
+@keybind(MODE.UNREAD, 'j')
 def next(app):
   return app.ui.grid_panel.next(app.reader.get_unread_entries())
 
-@callback(MODE.UNREAD, 'k')
+@keybind(MODE.UNREAD, 'k')
 def prev(app):
   return app.ui.grid_panel.prev(app.reader.get_unread_entries())
 
-@callback(MODE.BROWSE, 'j')
+@keybind(MODE.BROWSE, 'j')
 def next_browse(app):
   if next(app): switch_browse_mode(app)
 
-@callback(MODE.BROWSE, 'k')
+@keybind(MODE.BROWSE, 'k')
 def prev_browse(app):
   if prev(app): switch_browse_mode(app)
 
-@callback(MODE.BROWSE, ' ')
+@keybind(MODE.BROWSE, ' ')
 def down(app):
   app.ui.browse_panel.down(get_selected_entry(app))
 
-@callback(MODE.BROWSE, '\n')
-@callback(MODE.BROWSE, 'J')
+@keybind(MODE.BROWSE, 'J', '\n')
 def down1(app):
   app.ui.browse_panel.down(get_selected_entry(app), 1)
 
-@callback(MODE.BROWSE, '-')
+@keybind(MODE.BROWSE, '-')
 def up(app):
   app.ui.browse_panel.up(get_selected_entry(app))
 
-@callback(MODE.BROWSE, 'K')
+@keybind(MODE.BROWSE, 'K')
 def up1(app):
   app.ui.browse_panel.up(get_selected_entry(app), 1)
 
-@callback(MODE.UNREAD, 'm')
-@callback(MODE.BROWSE, 'm')
+@keybind(MODE.UNREAD, 'm')
+@keybind(MODE.BROWSE, 'm')
 @update_status
 def toggle_read(app):
   entry = get_selected_entry(app)
   app.reader.toggle_read(entry)
   update_panel(app, entry)
 
-@callback(MODE.UNREAD, 'p')
-@callback(MODE.BROWSE, 'p')
+@keybind(MODE.UNREAD, 'p')
+@keybind(MODE.BROWSE, 'p')
 @update_status
 def toggle_pin(app):
   entry = get_selected_entry(app)
   app.reader.toggle_pin(entry)
   update_panel(app, entry)
 
-@callback(MODE.UNREAD, 'O')
-@callback(MODE.BROWSE, 'O')
+@keybind(MODE.UNREAD, 'O')
+@keybind(MODE.BROWSE, 'O')
 @update_status
 def open(app):
   entry = get_selected_entry(app)
   open_external_browser(app, entry)
   update_panel(app, entry)
 
-@callback(MODE.UNREAD, 'o')
-@callback(MODE.BROWSE, 'o')
+@keybind(MODE.UNREAD, 'o')
+@keybind(MODE.BROWSE, 'o')
 @update_status
 def open_pinned_entries(app):
   for i in range(int(CONF.browse.max_count)):
