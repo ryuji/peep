@@ -24,7 +24,7 @@ class App(object):
   def main(self):
     locale.setlocale(locale.LC_ALL, '')  # anti garbled
     try:
-      curses.wrapper(self.event_loop)
+      curses.wrapper(self.command_loop)
     except KeyboardInterrupt:
       # curses.wrapper is not handling KeyboardInterrupt?
       self.stdscr.keypad(0)
@@ -32,7 +32,7 @@ class App(object):
       curses.echo()
       curses.endwin()
 
-  def event_loop(self, stdscr):
+  def command_loop(self, stdscr):
     self.stdscr = stdscr  # need except KeyboardInterrupt
     self.reader = Reader(**CONF.credential)
     self.ui = MainScreen(stdscr)

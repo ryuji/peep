@@ -3,7 +3,7 @@
 import sys
 import webbrowser
 
-from const import CONF, MODE
+from peep.const import CONF, MODE
 
 class Message(Exception):
 
