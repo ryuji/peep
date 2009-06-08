@@ -13,7 +13,7 @@ CONF = Config([
 ])
 
 class MODE(object):
-  UNREAD = 0
-  BROWSE = 1
-  STARED = 2
-  HELP   = 9
+  UNREAD  = 0
+  BROWSE  = 1
+  STARRED = 2
+  HELP    = 9

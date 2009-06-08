@@ -26,17 +26,17 @@ class Help(object):
       lambda c: self.convmap.get(c, c), keys)), fn.__doc__))
 
 KEYBINDS = {
-  MODE.UNREAD: {},
-  MODE.BROWSE: {},
-  MODE.STARED: {},
-  MODE.HELP:   {},
+  MODE.UNREAD:  {},
+  MODE.BROWSE:  {},
+  MODE.STARRED: {},
+  MODE.HELP:    {},
 }
 
 HELPS = {
-  MODE.UNREAD: Help(u'The Unread Items'),
-  MODE.BROWSE: Help(u'The Pager'),
-  MODE.STARED: Help(u'The Starred Items'),
-  MODE.HELP:   Help(),
+  MODE.UNREAD:  Help(u'The Unread Items'),
+  MODE.BROWSE:  Help(u'The Pager'),
+  MODE.STARRED: Help(u'The Starred Items'),
+  MODE.HELP:    Help(),
 }
 
 def execute(app, key=None):
