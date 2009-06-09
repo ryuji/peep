@@ -14,9 +14,9 @@ KEYBINDINGS = {
 }
 
 HELPS = {
-  MODE.UNREAD:  Help(u'The Unread Items'),
-  MODE.BROWSE:  Help(u'The Pager'),
-  MODE.STARRED: Help(u'The Starred Items'),
+  MODE.UNREAD:  Help(u'The list of unread items'),
+  MODE.BROWSE:  Help(u'The pager'),
+  MODE.STARRED: Help(u'The list of starred items'),
   MODE.HELP:    Help(),
 }
 
