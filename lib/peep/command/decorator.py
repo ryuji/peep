@@ -4,7 +4,9 @@ from help import Help
 from message import Message
 from peep.const import MODE
 
-KEYBINDS = {
+__all__ = ['bindkey', 'confirm', 'loading', 'update_status']
+
+KEYBINDINGS = {
   MODE.UNREAD:  {},
   MODE.BROWSE:  {},
   MODE.STARRED: {},
@@ -18,10 +20,10 @@ HELPS = {
   MODE.HELP:    Help(),
 }
 
-def keybind(mode, *keys):
+def bindkey(mode, *keys):
   def decorator(fn):
     HELPS[mode].append(fn, *keys)
-    for key in keys: KEYBINDS[mode][key] = fn
+    for key in keys: KEYBINDINGS[mode][key] = fn
     return fn
   return decorator
 

@@ -4,29 +4,35 @@ import sys
 import webbrowser
 
 from decorator import *
+from decorator import KEYBINDINGS, HELPS
 from message import Message
 from peep.const import CONF, MODE
 
-@keybind(MODE.UNREAD, 'q')
+__all__ = ['get']
+
+def get(mode, key):
+  return KEYBINDINGS.get(mode).get(key)
+
+@bindkey(MODE.UNREAD, 'q')
 @confirm(u'Are you sure you want to quit?')
 def quit(app):
   'exit peep'
   sys.exit()
 
-@keybind(MODE.HELP, 'q')
+@bindkey(MODE.HELP, 'q')
 def back_(app):
   'back to the previous mode'
   {MODE.UNREAD: switch_unread_mode,
    MODE.BROWSE: switch_browse_mode}.get(app.prev_mode)(app)
 
-@keybind(MODE.UNREAD, 'r')
+@bindkey(MODE.UNREAD, 'r')
 def refresh(app):
   'refreshes the unread items'
   app.reader.clear_cache()
   app.ui.grid_panel.clear()
   switch_unread_mode(app)
 
-@keybind(MODE.BROWSE, 'u', 'q')
+@bindkey(MODE.BROWSE, 'u', 'q')
 @loading
 @update_status
 def switch_unread_mode(app):
@@ -39,7 +45,7 @@ def switch_unread_mode(app):
     app.ui.grid_panel.clear()
     raise Message('Your reading list has no unread items.')
 
-@keybind(MODE.UNREAD, '\n')
+@bindkey(MODE.UNREAD, '\n')
 @loading
 @update_status
 def switch_browse_mode(app):
@@ -49,48 +55,48 @@ def switch_browse_mode(app):
   app.ui.browse_panel.update(entry)
   app.reader.set_read(entry)
 
-@keybind(MODE.UNREAD, 'j')
+@bindkey(MODE.UNREAD, 'j')
 def next(app):
   'selects the next item in the list'
   return app.ui.grid_panel.next(app.reader.get_unread_entries())
 
-@keybind(MODE.UNREAD, 'k')
+@bindkey(MODE.UNREAD, 'k')
 def prev(app):
   'selects the previous item in the list'
   return app.ui.grid_panel.prev(app.reader.get_unread_entries())
 
-@keybind(MODE.BROWSE, 'j')
+@bindkey(MODE.BROWSE, 'j')
 def next_browse(app):
   'display the next item'
   if next(app): switch_browse_mode(app)
 
-@keybind(MODE.BROWSE, 'k')
+@bindkey(MODE.BROWSE, 'k')
 def prev_browse(app):
   'display the previous item'
   if prev(app): switch_browse_mode(app)
 
-@keybind(MODE.BROWSE, ' ')
+@bindkey(MODE.BROWSE, ' ')
 def down(app):
   'display the next page'
   app.ui.browse_panel.down(get_selected_entry(app))
 
-@keybind(MODE.BROWSE, 'J', '\n')
+@bindkey(MODE.BROWSE, 'J', '\n')
 def down1(app):
   'go down one line'
   app.ui.browse_panel.down(get_selected_entry(app), 1)
 
-@keybind(MODE.BROWSE, '-')
+@bindkey(MODE.BROWSE, '-')
 def up(app):
   'go back to the previous page'
   app.ui.browse_panel.up(get_selected_entry(app))
 
-@keybind(MODE.BROWSE, 'K')
+@bindkey(MODE.BROWSE, 'K')
 def up1(app):
   'go up one line'
   app.ui.browse_panel.up(get_selected_entry(app), 1)
 
-@keybind(MODE.UNREAD, 'm')
-@keybind(MODE.BROWSE, 'm')
+@bindkey(MODE.UNREAD, 'm')
+@bindkey(MODE.BROWSE, 'm')
 @update_status
 def toggle_read(app):
   'switches the read status of the selected item'
@@ -98,8 +104,8 @@ def toggle_read(app):
   app.reader.toggle_read(entry)
   update_panel(app, entry)
 
-@keybind(MODE.UNREAD, 'p')
-@keybind(MODE.BROWSE, 'p')
+@bindkey(MODE.UNREAD, 'p')
+@bindkey(MODE.BROWSE, 'p')
 @update_status
 def toggle_pin(app):
   'switches the pin status of the selected item'
@@ -107,8 +113,8 @@ def toggle_pin(app):
   app.reader.toggle_pin(entry)
   update_panel(app, entry)
 
-@keybind(MODE.UNREAD, 'O')
-@keybind(MODE.BROWSE, 'O')
+@bindkey(MODE.UNREAD, 'O')
+@bindkey(MODE.BROWSE, 'O')
 @update_status
 def open(app):
   'open the selected item by the external browser '
@@ -116,8 +122,8 @@ def open(app):
   open_external_browser(app, entry)
   update_panel(app, entry)
 
-@keybind(MODE.UNREAD, 'o')
-@keybind(MODE.BROWSE, 'o')
+@bindkey(MODE.UNREAD, 'o')
+@bindkey(MODE.BROWSE, 'o')
 @update_status
 def open_pinned_entries(app):
   'open the pinned items by the external browser'
@@ -131,8 +137,8 @@ def open_pinned_entries(app):
   else:
     switch_unread_mode(app)
 
-@keybind(MODE.UNREAD, '?')
-@keybind(MODE.BROWSE, '?')
+@bindkey(MODE.UNREAD, '?')
+@bindkey(MODE.BROWSE, '?')
 def switch_help_mode(app):
   'show keybindings'
   app.ui.help_panel.update(HELPS[app.mode])

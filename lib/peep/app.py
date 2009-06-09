@@ -36,5 +36,6 @@ class App(object):
     self.stdscr = stdscr  # need except KeyboardInterrupt
     self.reader = Reader(**CONF.credential)
     self.ui = MainScreen(stdscr)
-    command.execute(self) # switch unread mode
+    self.mode = MODE.UNREAD
+    command.execute(self, 'r') # switch unread mode
     while 1: command.execute(self, stdscr.getkey())

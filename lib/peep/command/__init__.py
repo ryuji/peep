@@ -1,13 +1,12 @@
 # vim: fileencoding=utf-8
 
-from keybindings import switch_unread_mode
-from decorator import KEYBINDS
+import keybindings
 from message import Message
 
 __all__ = ['execute']
 
 def execute(app, key=None):
-  callback = KEYBINDS.get(app.mode).get(key) if key else switch_unread_mode
+  callback = keybindings.get(app.mode, key)
   if callback:
     try:
       callback(app)
