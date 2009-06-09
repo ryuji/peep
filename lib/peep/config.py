@@ -15,4 +15,4 @@ class Option(dict):
     try:
       return self[key]
     except KeyError, e:
-      raise AttributeError, e
+      raise AttributeError(e)
