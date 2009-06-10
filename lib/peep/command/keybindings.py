@@ -63,15 +63,6 @@ def switch_browse_mode(app):
   app.ui.browse_panel.update(entry)
   app.reader.set_read(entry)
 
-@bindkey(MODE.UNREAD, 'm')
-@bindkey(MODE.BROWSE, 'm')
-@update_status
-def toggle_read(app):
-  'switches the read status of the selected item'
-  entry = get_selected_entry(app)
-  app.reader.toggle_read(entry)
-  update_panel(app, entry)
-
 @bindkey(MODE.UNREAD, 'p')
 @bindkey(MODE.BROWSE, 'p')
 @update_status
@@ -79,6 +70,24 @@ def toggle_pin(app):
   'switches the pin status of the selected item'
   entry = get_selected_entry(app)
   app.reader.toggle_pin(entry)
+  update_panel(app, entry)
+
+@bindkey(MODE.UNREAD, 's')
+@bindkey(MODE.BROWSE, 's')
+@update_status
+def toggle_star(app):
+  'stars or un-stars the selected item'
+  entry = get_selected_entry(app)
+  app.reader.toggle_star(entry)
+  update_panel(app, entry)
+
+@bindkey(MODE.UNREAD, 'm')
+@bindkey(MODE.BROWSE, 'm')
+@update_status
+def toggle_read(app):
+  'switches the read status of the selected item'
+  entry = get_selected_entry(app)
+  app.reader.toggle_read(entry)
   update_panel(app, entry)
 
 @bindkey(MODE.UNREAD, 'O')

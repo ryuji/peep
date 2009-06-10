@@ -39,7 +39,7 @@ class GridPanel(Panel):
     n = len(published)
     x = 0
     x = self.update_column(row, x, '!' if entry['pinned'] else ' ', 1)
-    x = self.update_column(row, x, '*' if entry['stared'] else ' ', 1)
+    x = self.update_column(row, x, '*' if entry['starred'] else ' ', 1)
     x = self.update_column(row, x, 'U' if entry['unread'] else ' ', 1, 1)
     x = self.update_column(row, x, entry['subscription_title'], self.width/5, 2)
     x = self.update_column(row, x, entry['title'], self.width-x-n-2)

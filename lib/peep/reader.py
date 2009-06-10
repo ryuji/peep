@@ -50,9 +50,11 @@ class Reader(object):
       entry['subscription_id'] = id
       entry['subscription_title'] = subscriptions[id]['title']
       entry['pinned'] = False
-      entry['stared'] = False # TODO
-      unread = entry['categories']['user/-/state/com.google/fresh']
-      entry['unread'] = unread=='fresh'
+      # XXX
+      cat = entry['categories']
+      entry['starred'] = cat.has_key(CONST.ATOM_STATE_STARRED)
+      # FIXME fresh? or unread?
+      entry['unread'] = cat.has_key(CONST.ATOM_STATE_FRESH)
       entries.append(entry)
     return entries
 
@@ -69,12 +71,31 @@ class Reader(object):
       if k.endswith('/state/com.google/reading-list'): return v
     return 0
 
+  def get_pinned_count(self):
+    return len(self.get_pinned_entries())
+
+  @cache('starred_count')
+  def get_starred_count(self):
+    return len(filter(lambda x: x['starred'], self.get_unread_entries()))
+
   @cache('pinned_entries')
   def get_pinned_entries(self):
     return []
 
-  def get_pinned_count(self):
-    return len(self.get_pinned_entries())
+  def toggle_pin(self, entry):
+    entry['pinned'] = not entry['pinned']
+    if entry['pinned']: self.get_pinned_entries().append(entry)
+    else:               self.get_pinned_entries().remove(entry)
+
+  def toggle_star(self, entry):
+    # XXX
+    if entry['starred']:
+      self.reader.del_star(entry['google_id'])
+      self.cache['starred_count'] -= 1
+    else:
+      self.reader.add_star(entry['google_id'])
+      self.cache['starred_count'] += 1
+    entry['starred'] = not entry['starred']
 
   def set_read(self, entry):
     if not entry['unread']: return
@@ -91,8 +112,3 @@ class Reader(object):
   def toggle_read(self, entry):
      if entry['unread']: self.set_read(entry)
      else:               self.set_unread(entry)
-
-  def toggle_pin(self, entry):
-    entry['pinned'] = not entry['pinned']
-    if entry['pinned']: self.get_pinned_entries().append(entry)
-    else:               self.get_pinned_entries().remove(entry)

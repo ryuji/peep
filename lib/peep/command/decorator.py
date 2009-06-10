@@ -48,10 +48,9 @@ def update_status(fn):
     except Exception, e:
       raise e
     finally:
-    # TODO
       app.ui.status_line.update(app.reader.get_feed_title(),
                                 app.reader.get_pinned_count(),
-                                0,
+                                app.reader.get_starred_count(),
                                 app.reader.get_unread_count())
   wrapper.__doc__ = fn.__doc__
   return wrapper
