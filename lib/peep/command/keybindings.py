@@ -90,6 +90,18 @@ def toggle_read(app):
   app.reader.toggle_read(entry)
   update_panel(app, entry)
 
+@bindkey(MODE.UNREAD, 'A')
+@update_status
+@confirm(u'Are you sure you want to all items as read?', False)
+@loading
+def mark_all_as_read(app):
+  'mark all items in the current view as read'
+  # XXX very very slowly! need asynchronous?
+  entries = app.reader.get_unread_entries()
+  for entry in entries:
+    app.reader.set_read(entry)
+  app.ui.grid_panel.update(entries)
+
 @bindkey(MODE.UNREAD, 'O')
 @bindkey(MODE.BROWSE, 'O')
 @update_status
