@@ -46,6 +46,7 @@ class Reader(object):
     subscriptions = self.get_subscriptions()
     entries = []
     for entry in self.get_unread_feed().get_entries():
+      if self.ad_filter(entry): continue
       id = entry['sources'].keys()[0]
       entry['subscription_id'] = id
       entry['subscription_title'] = subscriptions[id]['title']
@@ -112,3 +113,10 @@ class Reader(object):
   def toggle_read(self, entry):
      if entry['unread']: self.set_read(entry)
      else:               self.set_unread(entry)
+
+  def ad_filter(self, entry):
+    if not CONF.ad_filter.enable: return False
+    if CONF.ad_filter.pattern.match(entry['title']):
+      self.reader.set_read(entry['google_id'])
+      return True
+    return False

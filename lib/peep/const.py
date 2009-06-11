@@ -1,6 +1,7 @@
 # vim: fileencoding=utf-8
 
 import os
+import re
 
 from config import Config
 
@@ -11,6 +12,10 @@ CONF = Config([
   '/etc/peeprc',
   os.path.expanduser('~/.peeprc'),
 ])
+
+# XXX
+CONF.ad_filter.enable = CONF.ad_filter.enable == 'True'
+CONF.ad_filter.pattern = re.compile(CONF.ad_filter.pattern)
 
 class MODE(object):
   UNREAD  = 0
