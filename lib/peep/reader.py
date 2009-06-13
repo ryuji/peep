@@ -1,5 +1,6 @@
 # vim: fileencoding=utf-8
 
+from subprocess import Popen, PIPE
 from threading import Thread
 
 from GoogleReader import GoogleReader, CONST
@@ -93,22 +94,22 @@ class Reader(object):
   def toggle_star(self, entry):
     # XXX
     if entry['starred']:
-      Thread(target=self.reader.del_star, args=(entry['google_id'],)).run()
+      ChildThread(self.reader.del_star, entry['google_id']).start()
       self.cache['starred_count'] -= 1
     else:
-      Thread(target=self.reader.add_star, args=(entry['google_id'],)).run()
+      ChildThread(self.reader.add_star, entry['google_id']).start()
       self.cache['starred_count'] += 1
     entry['starred'] = not entry['starred']
 
   def set_read(self, entry):
     if not entry['unread']: return
-    Thread(target=self.reader.set_read, args=(entry['google_id'],)).run()
+    ChildThread(self.reader.set_read, entry['google_id']).start()
     entry['unread'] = False
     self.cache['unread_count'] -= 1
 
   def set_unread(self, entry):
     if entry['unread']: return
-    Thread(target=self.reader.set_unread, args=(entry['google_id'],)).run()
+    ChildThread(self.reader.set_unread, entry['google_id']).start()
     entry['unread'] = True
     self.cache['unread_count'] += 1
 
@@ -119,6 +120,16 @@ class Reader(object):
   def ad_filter(self, entry):
     if not CONF.ad_filter.enable: return False
     if CONF.ad_filter.pattern.match(entry['title']):
-      self.reader.set_read(entry['google_id'])
+      Thread(target=self.reader.set_unread, args=(entry['google_id'],)).run()
       return True
     return False
+
+class ChildThread(Thread):
+
+  def __init__(self, fn, *args):
+    Thread.__init__(self)
+    self.fn = fn
+    self.args = args
+
+  def run(self):
+    self.fn(*self.args)
