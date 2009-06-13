@@ -25,4 +25,4 @@ def main(argv=sys.argv):
     else:
       parser.print_help()
   except Exception, e:
-    sys.exit(e.message)
+    sys.exit(e)

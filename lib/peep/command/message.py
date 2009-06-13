@@ -2,8 +2,8 @@
 
 class Message(Exception):
 
-  def __init__(self, message, type='inform'):
-    self.message, self.type = message, type
+  def __init__(self, value, type='inform'):
+    self.value, self.type = value, type
 
-  def __str__(self):
-    return self.message
+  def __unicode__(self):
+    return unicode(self.value)
