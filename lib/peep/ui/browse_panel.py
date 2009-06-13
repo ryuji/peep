@@ -39,15 +39,6 @@ class BrowsePanel(Panel):
 
   def update_body(self, entry):
     self.body.erase()
-
-    if not entry.get('converted'):
-      cmd = 'w3m -dump -T text/html -cols %d' % (self.width-2)
-      proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE)
-      proc.stdin.write(entry['content'].encode('utf-8'))
-      proc.stdin.close()
-      entry['content'] = proc.stdout.readlines()
-      entry['converted'] = True
-
     content = entry['content'][self.scrolled:self.b_height+self.scrolled-1]
     for i,line in enumerate(content): self.body.addstr(i, 0, line)
     self.body.noutrefresh()

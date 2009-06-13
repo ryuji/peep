@@ -60,6 +60,7 @@ class Reader(object):
       # FIXME fresh? or unread?
       entry['unread'] = cat.has_key(CONST.ATOM_STATE_FRESH)
       entries.append(entry)
+    ChildThread(self.decode, entries).start()
     return entries
 
   @cache('unread_counts')
@@ -123,6 +124,14 @@ class Reader(object):
       Thread(target=self.reader.set_unread, args=(entry['google_id'],)).run()
       return True
     return False
+
+  def decode(self, entries):
+    for entry in entries:
+      cmd = 'w3m -dump -T text/html'
+      proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE)
+      proc.stdin.write(entry['content'].encode('utf-8'))
+      proc.stdin.close()
+      entry['content'] = proc.stdout.readlines()
 
 class ChildThread(Thread):
 
