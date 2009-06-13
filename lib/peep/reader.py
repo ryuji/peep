@@ -121,7 +121,7 @@ class Reader(object):
   def ad_filter(self, entry):
     if not CONF.ad_filter.enable: return False
     if CONF.ad_filter.pattern.match(entry['title']):
-      Thread(target=self.reader.set_unread, args=(entry['google_id'],)).run()
+      Thread(target=self.reader.set_read, args=(entry['google_id'],)).run()
       return True
     return False
 
