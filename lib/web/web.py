@@ -107,10 +107,10 @@ class webUrllib2 :
                 handle.close()
                 result = file
         except IOError :
-            print "IOError"
+#            print "IOError"
             pass
         except socket.error :
-            print "socket.error"
+#            print "socket.error"
             pass
         return result
 

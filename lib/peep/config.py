@@ -2,12 +2,16 @@
 
 from ConfigParser import SafeConfigParser
 
-class Config(object):
+class Config(SafeConfigParser):
 
   def __init__(self, files):
-    cp = SafeConfigParser()
-    cp.read(files)
-    for x in cp.sections(): setattr(self, x, Option(cp.items(x)))
+    SafeConfigParser.__init__(self)
+    self.read(files)
+    for x in self.sections(): setattr(self, x, Option(self.items(x)))
+
+  def set(self, section, option, value):
+    SafeConfigParser.set(self, section, option, value)
+    getattr(self, section)[option] = value
 
 class Option(dict):
 
