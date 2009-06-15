@@ -1,7 +1,5 @@
 # vim: fileencoding=utf-8
 
-from subprocess import Popen, PIPE
-
 from panel import *
 
 class BrowsePanel(Panel):
