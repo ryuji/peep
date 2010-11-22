@@ -22,6 +22,8 @@ class GoogleReader(object) :
         self._agent = agent or CONST.AGENT
         self._web = web(agent=self._agent,http_proxy=http_proxy)
         self._sid = None
+        self._lsid = None
+        self._auth = None
 
         self._token = None
 
@@ -49,15 +51,19 @@ class GoogleReader(object) :
             'continue':'http://www.google.com/',
             }
 
-        sidinfo = self._web.get( CONST.URI_LOGIN, data )
-        # print sidinfo
+        response = self._web.get( CONST.URI_LOGIN, data )
+        for l in response.splitlines() :
+          key, value = l.split('=', 1)
+          if key == 'SID' :
+            self._sid = value
+          elif key == 'LSID' :
+            self._lsid = value
+          elif key == 'Auth' :
+            self._auth = value
 
-        self._sid = None
-        SID_ID = 'SID='
-        if SID_ID in sidinfo :
-            pos_beg = sidinfo.find(SID_ID)
-            pos_end = sidinfo.find('\n',pos_beg)
-            self._sid = sidinfo[pos_beg+len(SID_ID):pos_end]
+        if self._auth != None :
+          self._web.set_auth(self._auth)
+
         if self._sid != None :
             cookie = cookielib.Cookie(version=0, name='SID', value=self._sid, port=None, port_specified=False, domain='.google.com', domain_specified=True, domain_initial_dot=True, path='/', path_specified=True, secure=False, expires='1600000000', discard=False, comment=None, comment_url=None, rest={})
             self._web.cookies().set_cookie(cookie)
