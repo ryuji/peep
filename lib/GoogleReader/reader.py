@@ -52,14 +52,10 @@ class GoogleReader(object) :
             }
 
         response = self._web.get( CONST.URI_LOGIN, data )
-        for l in response.splitlines() :
-          key, value = l.split('=', 1)
-          if key == 'SID' :
-            self._sid = value
-          elif key == 'LSID' :
-            self._lsid = value
-          elif key == 'Auth' :
-            self._auth = value
+        authinfo = dict([x.split('=', 1) for x in response.splitlines()])
+        self._sid = authinfo['SID']
+        self._lsid = authinfo['LSID']
+        self._auth = authinfo['Auth']
 
         if self._auth != None :
           self._web.set_auth(self._auth)
